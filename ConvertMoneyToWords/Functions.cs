@@ -12,21 +12,17 @@ namespace ConvertMoneyToWords
         public static string GetWords(string number)
         {
             var value = SafeNumber(number);
+
+            if (value >= 1000000000 || value < 0)
+            {
+                return "Invalid entry";
+            }
+
             var workingPounds = SafePounds(value);
             var workingPence = SafePence(value);
 
             var pounds = workingPounds.Bind(x => FormatPluralPounds(x));
             var pence = workingPence.Bind(x => FormatPluralPence(x));
-
-            if (workingPounds < 0)
-            {
-                return pence.Match(Some: x => x, None: () => "Invalid entry");
-            }
-
-            if (workingPence < 0)
-            {
-                return pounds.Match(x => x, () => "Invalid entry");
-            }
 
             return pounds.Match(x => x, () => "") + " and " + pence.Match(x => x, () => "");
         }
